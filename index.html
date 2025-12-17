@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Status Servidor AO</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; text-align: center; }
+    #server-status { font-size: 1.2em; margin-top: 20px; }
+    .online { color: green; }
+    .offline { color: red; }
+    .timeout { color: orange; }
+  </style>
+</head>
+<body>
+  <h1>Estado del Servidor</h1>
+  <div id="server-status">Comprobando...</div>
+
+  <script>
+    // Tu plantilla sustituirá $LINK_MAC_DIRECT$ por la URL real del servidor
+    const url = "$LINK_MAC_DIRECT$";
+
+    // Si usas Vercel para backend + frontend:
+    fetch(`/api/checkServer?url=${encodeURIComponent(url)}`)
+      .then(r => r.json())
+      .then(data => {
+        const el = document.getElementById("server-status");
+        el.textContent = `HTTP: ${data.http} | TCP: ${data.tcp}`;
+
+        if (data.tcp.includes("ONLINE")) el.className = "online";
+        else if (data.tcp.includes("TIMEOUT")) el.className = "timeout";
+        else el.className = "offline";
+      })
+      .catch(() => {
+        document.getElementById("server-status").textContent = "Error consultando estado";
+      });
+  </script>
+</body>
+</html>
