@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Estado Servidores AO</title>
+  <title>Estado de los servidores AO</title>
   <style>
     body { font-family: Arial, sans-serif; }
     .server.on { color: green; }
@@ -16,10 +16,10 @@
   <div id="estado"></div>
 
   <script>
+  // 👇 Lista de servidores: añade aquí los que quieras
   const servidores = [
     { nombre: "Argentum Online", url: "https://argentum-online.org/online" },
     { nombre: "AOForever", url: "https://aoforever.org/status" }
-    // 👆 Añade aquí más servidores cuando quieras
   ];
 
   async function consultarEstado() {
@@ -57,3 +57,4 @@
   </script>
 </body>
 </html>
+
