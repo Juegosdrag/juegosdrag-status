@@ -2,6 +2,16 @@
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
+  // Cabeceras CORS para permitir llamadas desde cualquier dominio
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Manejo de preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   const { url } = req.query;
 
   if (!url) {
@@ -10,9 +20,8 @@ export default async function handler(req, res) {
 
   try {
     const respuesta = await fetch(url);
-    const texto = await respuesta.text(); // 👈 leer como texto
+    const texto = await respuesta.text();
 
-    // Regex para extraer servidores con formato: "Servidor X - ONLINE/OFFLINE - Y jugadores"
     const regex = /Servidor\s+(.+?)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s+jugadores/gi;
     const servers = [];
     let match;
