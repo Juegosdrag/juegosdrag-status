@@ -7,8 +7,8 @@ export default async function handler(req, res) {
     const response = await fetch(url);
     const html = await response.text();
 
-    // Regex más estricta: busca líneas con formato "número - ONLINE/OFFLINE - jugadores"
-    const regex = /(\d+)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s*jugadores/gi;
+    // Regex más estricta: busca formato "Servidor X - ONLINE/OFFLINE - Y jugadores"
+    const regex = /Servidor\s+(\d+)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s*jugadores/gi;
     let servers = [];
     let match;
 
@@ -23,7 +23,9 @@ export default async function handler(req, res) {
     // Filtrar duplicados y entradas irrelevantes
     servers = servers.filter(
       (s, i, arr) =>
-        arr.findIndex(x => x.name === s.name) === i && s.name !== "0" && s.name !== "000"
+        arr.findIndex(x => x.name === s.name) === i &&
+        s.name !== "0" &&
+        s.name !== "000"
     );
 
     res.status(200).json({ ok: true, servers });
