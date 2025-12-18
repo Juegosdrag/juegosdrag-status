@@ -1,5 +1,4 @@
 // api/check-server.js
-import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -12,14 +11,14 @@ export default async function handler(req, res) {
 
   const { url } = req.query;
   if (!url) {
-    return res.status(400).json({ ok: false, error: 'Falta parámetro url' });
+    return res.status(400).json({ ok: false, error: "Falta parámetro url" });
   }
 
   try {
-    const respuesta = await fetch(url);
+    const respuesta = await fetch(url); // 👈 usar fetch global
     const texto = await respuesta.text();
 
-    // Intentar regex
+    // Regex para servidores
     const regex = /Servidor\s+(.+?)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s+jugadores/gi;
     const servers = [];
     let match;
@@ -27,16 +26,15 @@ export default async function handler(req, res) {
       servers.push({
         name: match[1].trim(),
         status: match[2],
-        players: parseInt(match[3], 10)
+        players: parseInt(match[3], 10),
       });
     }
 
-    if (servers.length > 0) {
-      res.status(200).json({ ok: true, servers });
-    } else {
-      // Si no hay matches, devolver el texto crudo
-      res.status(200).json({ ok: true, raw: texto });
-    }
+    res.status(200).json({
+      ok: true,
+      servers,
+      raw: servers.length === 0 ? texto.slice(0, 200) + "..." : undefined,
+    });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
