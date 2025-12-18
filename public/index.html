@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Estado Servidores AO</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .server.on { color: green; }
+    .server.off { color: red; }
+    .status-loading { color: gray; }
+    .status-error { color: orange; }
+  </style>
+</head>
+<body>
+  <h1>Estado de los servidores</h1>
+  <div id="estado"></div>
+
+  <script>
+  const servidores = [
+    { nombre: "Argentum Online", url: "https://argentum-online.org/online" },
+    { nombre: "AOForever", url: "https://aoforever.org/status" }
+    // 👆 Añade aquí más servidores cuando quieras
+  ];
+
+  async function consultarEstado() {
+    const contenedor = document.querySelector('#estado');
+    contenedor.textContent = 'Consultando estado…';
+    contenedor.className = 'status-loading';
+
+    try {
+      const resultados = await Promise.all(
+        servidores.map(async s => {
+          const r = await fetch(`/api/check-server?url=${encodeURIComponent(s.url)}`);
+          const data = await r.json();
+          return { nombre: s.nombre, ...data };
+        })
+      );
+
+      contenedor.innerHTML = resultados.map(res => {
+        if (!res.ok) {
+          return `<div class="status-error">${res.nombre}: Error — ${res.error || 'desconocido'}</div>`;
+        }
+        return res.servers.map(srv => `
+          <div class="server ${srv.status === 'ONLINE' ? 'on' : 'off'}">
+            ${res.nombre} — ${srv.name} — ${srv.status} — ${srv.players} jugadores
+          </div>
+        `).join('');
+      }).join('');
+      contenedor.className = '';
+    } catch (e) {
+      contenedor.textContent = `Error: ${e.message}`;
+      contenedor.className = 'status-error';
+    }
+  }
+
+  consultarEstado();
+  </script>
+</body>
+</html>
