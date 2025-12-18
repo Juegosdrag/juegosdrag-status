@@ -5,9 +5,8 @@ export default async function handler(req, res) {
 
   try {
     const respuesta = await fetch(url);
-    const texto = await respuesta.text(); // 👈 leer como texto, no JSON
+    const texto = await respuesta.text(); // 👈 leer como texto
 
-    // Regex para extraer servidores
     const regex = /Servidor\s+(.+?)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s+jugadores/gi;
     const servers = [];
     let match;
