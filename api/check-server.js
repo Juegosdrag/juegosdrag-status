@@ -1,32 +1,23 @@
-import fetch from "node-fetch";
+import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   const { url } = req.query;
 
   try {
-    const response = await fetch(url);
-    const html = await response.text();
+    const respuesta = await fetch(url);
+    const texto = await respuesta.text(); // 👈 leer como texto, no JSON
 
-    // Regex más estricta: busca formato "Servidor X - ONLINE/OFFLINE - Y jugadores"
-    const regex = /Servidor\s+(\d+)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s*jugadores/gi;
-    let servers = [];
+    // Regex para extraer servidores
+    const regex = /Servidor\s+(.+?)\s*-\s*(ONLINE|OFFLINE)\s*-\s*(\d+)\s+jugadores/gi;
+    const servers = [];
     let match;
-
-    while ((match = regex.exec(html)) !== null) {
+    while ((match = regex.exec(texto)) !== null) {
       servers.push({
-        name: match[1],
+        name: match[1].trim(),
         status: match[2],
         players: parseInt(match[3], 10)
       });
     }
-
-    // Filtrar duplicados y entradas irrelevantes
-    servers = servers.filter(
-      (s, i, arr) =>
-        arr.findIndex(x => x.name === s.name) === i &&
-        s.name !== "0" &&
-        s.name !== "000"
-    );
 
     res.status(200).json({ ok: true, servers });
   } catch (error) {
